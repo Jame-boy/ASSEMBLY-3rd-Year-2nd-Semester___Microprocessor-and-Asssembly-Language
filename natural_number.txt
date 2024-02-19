@@ -1,0 +1,91 @@
+store macro res
+            div x
+            mov res,dl;dividing and storing the last bit in dl i.e. is the remainder
+            mov dx,0
+endm
+
+ansprint macro res
+            mov dl,res
+            add dl,30h
+            mov ah,02h
+            int 21h
+endm
+data segment
+
+    number dw  ? 
+            result dw  ? 
+    msg db 10,13,"enter a last number to find sum $"
+    msgres db 10,13,"sum = $"
+           
+            res db 8 dup(0)
+            x dw 10
+
+data ends 
+
+code segment   
+assume cs:code,ds:data
+start: 
+
+            mov ax,data
+            mov ds,ax
+           
+    ;displaying the message
+            mov dx,offset msg
+            mov ah,09h
+            int 21h
+           
+            ;taking the input
+            mov ah,01h
+            int 21h
+            sub al,30h
+            mov bh,al
+            mov ah,01h
+            int 21h
+            sub al,30h
+            mov bl,al
+            mov ax,bx
+            aad
+            mov bx,ax
+                            
+                             
+                            
+            ;storing the number
+            mov number,ax
+            mov bx,0001h
+            mov ax,0000h
+            mov cx,number
+            label1:
+                        add ax,bx
+                        inc bl
+            loop label1      
+                         
+    mov result,ax
+   
+    ;displaying the result message
+            mov dx,offset msgres
+            mov ah,09h
+            int 21h 
+                                     
+            mov dx,0000h  
+            mov ax,result
+            ;storing the result
+            store res+3
+            store res+2
+            store res+1
+            store res+0
+           
+            ;displaying the 1st part of result
+            ansprint res+0
+            ansprint res+1
+            ansprint res+2
+            ansprint res+3
+           
+           
+           
+    ;terminate the program
+            mov ax,4c00h
+            int 21h                         
+                                                                                   
+   
+code ends
+end start
